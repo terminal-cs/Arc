@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using static System.IO.File;
 
 namespace Arc
@@ -13,12 +14,32 @@ namespace Arc
             Path = ArcPath;
             if (Exists(Path))
             {
-                foreach (string str in ReadAllLines(Path))
+                foreach (string line in ReadAllLines(Path))
                 {
-                    Arcs.Add(str.Split('=')[0], str.Split('=')[1]);
+                    if(!line.Contains('='))
+                        continue;
+                    var LineData = str.Split('=');
+                    Arcs.Add(LineData[0], LineData[1]);
                 }
             }
             else { WriteAllText(Path, ""); }
+        }
+
+        public string this[string key]
+        {
+            get {
+                return Read(key);
+            }
+            set {
+                if(Exists(key))
+                {
+                    Modify(key, value);
+                }
+                else
+                {
+                    Create(key, value);
+                }
+            }
         }
 
         public string Read(string Key) => Arcs[Key];
@@ -28,12 +49,17 @@ namespace Arc
         public void Remove(string Key) => Arcs.Remove(Key);
         public void Save()
         {
-            string Final = "";
-            foreach (KeyValuePair<string, string> Pair in Arcs)
-            {
-                Final = Final + Pair.Key + "=" + Pair.Value + "\n";
-            }
-            WriteAllText(Path, Final);
+            WriteAllText(Path, this.ToString());
         }
+
+        public override string ToString()
+        {
+            return string.Join(
+                Arcs.Select(i => {
+                return $@"{i.Key}={i.Value}";
+            }), 
+            System.Environment.NewLine);
+        }
+
     }
 }
