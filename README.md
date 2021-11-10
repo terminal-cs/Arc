@@ -5,6 +5,7 @@ Arc is a custom file format loader that is super basic and fast. It is a general
 Of course! just be sure to give me credit somewhere, because just taking isn't verry nice.
 ## To-Do
 | Idea       | Dificulty        |
+=================================
 | Encryption | low (hopefully   |
 ## Contact me
 Questions? Suggestions? Contact me at EvanLawrence@cyberfear.com
