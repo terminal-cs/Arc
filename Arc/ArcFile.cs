@@ -1,45 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using static System.IO.File;
+using static Arc.Cryptography;
 
 namespace Arc
 {
-    /// <summary> Arcfile, made by terminal.cs. (Version 1.0) </summary>
+    /// <summary>
+    /// Arcfile, made by terminal.cs. (Version 1.1)
+    /// https://github.com/terminal-cs/Arc
+    /// </summary>
     public class ArcFile
     {
-        private readonly string Path = "";
+        private readonly string Key, Path;
+        private string Final = "";
         private readonly Dictionary<string, string> Arcs = new Dictionary<string, string>();
-        public ArcFile(string ArcPath)
+
+        public ArcFile(string ArcPath, string CryptKey)
         {
             Path = ArcPath;
-            if (Exists(Path))
+            Key = CryptKey;
+            if (File.Exists(Path))
             {
-                foreach (string line in ReadAllLines(Path))
+                foreach (string Line in Decrypt(File.ReadAllText(Path), CryptKey).Split('\n'))
                 {
-                    if(!line.Contains('='))
-                        continue;
-                    var LineData = str.Split('=');
+                    if (!Line.Contains('=')) { continue; }
+
+                    string[] LineData = Line.Split('=');
                     Arcs.Add(LineData[0], LineData[1]);
                 }
             }
-            else { WriteAllText(Path, ""); }
-        }
-
-        public string this[string key]
-        {
-            get {
-                return Read(key);
-            }
-            set {
-                if(Exists(key))
-                {
-                    Modify(key, value);
-                }
-                else
-                {
-                    Create(key, value);
-                }
-            }
+            else
+            { File.WriteAllText(Path, ""); }
         }
 
         public string Read(string Key) => Arcs[Key];
@@ -49,17 +40,11 @@ namespace Arc
         public void Remove(string Key) => Arcs.Remove(Key);
         public void Save()
         {
-            WriteAllText(Path, this.ToString());
+            foreach (KeyValuePair<string, string> Pair in Arcs)
+            {
+                Final += Pair.Key + '=' + Pair.Value + '\n';
+            }
+            File.WriteAllText(Path, Encrypt(Final, Key));
         }
-
-        public override string ToString()
-        {
-            return string.Join(
-                Arcs.Select(i => {
-                return $@"{i.Key}={i.Value}";
-            }), 
-            System.Environment.NewLine);
-        }
-
     }
 }
