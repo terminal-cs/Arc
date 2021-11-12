@@ -40,6 +40,7 @@ namespace Arc
         public void Remove(string Key) => Arcs.Remove(Key);
         public void Save()
         {
+            Final = "";
             foreach (KeyValuePair<string, string> Pair in Arcs)
             {
                 Final += Pair.Key + '=' + Pair.Value + '\n';
